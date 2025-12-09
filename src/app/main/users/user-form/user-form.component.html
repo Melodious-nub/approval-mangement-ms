@@ -1,0 +1,96 @@
+<div>
+  <div class="mb-6">
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+      {{ isEditMode ? 'Edit User' : 'Create User' }}
+    </h1>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+      {{ isEditMode ? 'Update user information' : 'Add a new user to the system' }}
+    </p>
+  </div>
+
+  @if (isLoading && isEditMode) {
+    <app-loading-spinner></app-loading-spinner>
+  } @else {
+    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg border border-gray-200 dark:border-gray-700">
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="p-4 sm:p-6">
+        @if (errorMessage) {
+          <div class="mb-4 flex items-center p-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+            <svg class="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+            </svg>
+            <div>{{ errorMessage }}</div>
+          </div>
+        }
+
+        <div class="space-y-6">
+          <!-- Name -->
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
+            <input
+              type="text"
+              id="name"
+              formControlName="name"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            />
+            @if (userForm.get('name')?.invalid && userForm.get('name')?.touched) {
+              <p class="mt-1 text-sm text-red-600">Name is required</p>
+            }
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            />
+            @if (userForm.get('email')?.invalid && userForm.get('email')?.touched) {
+              <p class="mt-1 text-sm text-red-600">
+                {{ userForm.get('email')?.errors?.['required'] ? 'Email is required' : 'Valid email is required' }}
+              </p>
+            }
+          </div>
+
+          <!-- Active Status -->
+          <div>
+            <div class="flex items-center">
+              <input
+                type="checkbox"
+                id="active"
+                formControlName="active"
+                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <label for="active" class="ml-2 block text-sm text-gray-900 dark:text-white">Active</label>
+            </div>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Only active users can log in or be assigned as approvers</p>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="mt-6 flex flex-col sm:flex-row justify-end gap-3">
+          <button
+            type="button"
+            (click)="cancel()"
+            class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 transition-all duration-200"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            [disabled]="userForm.invalid || isLoading"
+            class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          >
+            @if (isLoading) {
+              <span>Saving...</span>
+            } @else {
+              <span>{{ isEditMode ? 'Update' : 'Create' }}</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>
+

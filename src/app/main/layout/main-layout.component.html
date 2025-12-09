@@ -1,0 +1,131 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-x-hidden">
+  <!-- Navigation Bar -->
+  <nav class="bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 fixed top-0 left-0 right-0 z-30">
+    <div class="px-3 py-3 lg:px-5 lg:pl-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center justify-start">
+          <button
+            type="button"
+            (click)="toggleSidebar()"
+            class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+          >
+            <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+            </svg>
+          </button>
+          <a routerLink="/main/dashboard" class="flex ml-2 md:ml-0">
+            <div class="flex items-center">
+              <div class="p-2 bg-blue-600 rounded-lg">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                </svg>
+              </div>
+              <span class="self-center ml-3 text-xl font-semibold whitespace-nowrap dark:text-white md:hidden">Approval Management</span>
+            </div>
+          </a>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="hidden md:flex items-center gap-2 px-2 lg:px-3 py-2 text-sm font-medium text-gray-900 dark:text-white">
+            <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
+              {{ currentUser?.name?.charAt(0) }}
+            </div>
+            <div class="flex flex-col min-w-0 hidden lg:block">
+              <span class="text-sm truncate">{{ currentUser?.name }}</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ currentUser?.email }}</span>
+            </div>
+          </div>
+          <button
+            (click)="logout()"
+            type="button"
+            class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-3 sm:px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 transition-all duration-200 flex-shrink-0"
+          >
+            <span class="flex items-center">
+              <svg class="w-4 h-4 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
+              <span class="hidden sm:inline">Logout</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="flex pt-16">
+    <!-- Sidebar -->
+    <aside
+      [class]="'fixed top-0 left-0 z-40 w-64 h-screen pt-16 transition-transform md:translate-x-0 bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700 ' + (isSidebarOpen ? 'translate-x-0' : '-translate-x-full')"
+    >
+      <div class="h-full px-3 py-4 overflow-y-auto bg-white dark:bg-gray-800">
+        <ul class="space-y-2 font-medium">
+          <li>
+            <a
+              routerLink="/main/dashboard"
+              routerLinkActive="bg-blue-50 text-blue-600 dark:bg-gray-700 dark:text-blue-500"
+              [routerLinkActiveOptions]="{exact: true}"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group transition-all duration-200"
+            >
+              <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
+                <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z"></path>
+                <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z"></path>
+              </svg>
+              <span class="ms-3">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a
+              routerLink="/main/users"
+              routerLinkActive="bg-blue-50 text-blue-600 dark:bg-gray-700 dark:text-blue-500"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group transition-all duration-200"
+            >
+              <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                <path d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z"></path>
+              </svg>
+              <span class="flex-1 ms-3 whitespace-nowrap">Users</span>
+            </a>
+          </li>
+          <li>
+            <a
+              routerLink="/main/requisitions"
+              routerLinkActive="bg-blue-50 text-blue-600 dark:bg-gray-700 dark:text-blue-500"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group transition-all duration-200"
+            >
+              <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
+                <path d="M17 5.923A1 1 0 0 0 16 5h-3V4a4 4 0 1 0-8 0v1H2a1 1 0 0 0-1 .923L.086 17.846A2 2 0 0 0 2.08 20h13.84a2 2 0 0 0 1.994-2.153L17 5.923ZM7 9a1 1 0 0 1-2 0V7a1 1 0 0 1 2 0v2Zm4 0a1 1 0 0 1-2 0V7a1 1 0 1 1 2 0v2Zm3-1a1 1 0 0 1 0 2h-1a1 1 0 1 1 0-2h1Z"></path>
+              </svg>
+              <span class="flex-1 ms-3 whitespace-nowrap">Requisitions</span>
+            </a>
+          </li>
+          <li>
+            <a
+              routerLink="/main/approvals"
+              routerLinkActive="bg-blue-50 text-blue-600 dark:bg-gray-700 dark:text-blue-500"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group transition-all duration-200"
+            >
+              <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"></path>
+              </svg>
+              <span class="flex-1 ms-3 whitespace-nowrap">My Approvals</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Overlay for mobile -->
+    @if (isSidebarOpen) {
+      <div
+        class="fixed inset-0 bg-gray-900 bg-opacity-50 z-30 md:hidden"
+        (click)="toggleSidebar()"
+      ></div>
+    }
+
+    <!-- Main Content -->
+    <main class="flex-1 md:ml-64 pt-4 pb-4 px-4 md:px-6 min-w-0">
+      <div class="w-full max-w-full overflow-x-hidden">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>
+

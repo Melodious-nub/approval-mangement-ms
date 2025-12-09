@@ -1,0 +1,148 @@
+<div>
+  <div class="mb-6">
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+      {{ isEditMode ? 'Edit Requisition' : 'Create Requisition' }}
+    </h1>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+      {{ isEditMode ? 'Update requisition information' : 'Create a new item requisition' }}
+    </p>
+  </div>
+
+  @if (isLoading && isEditMode) {
+    <app-loading-spinner></app-loading-spinner>
+  } @else {
+    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg border border-gray-200 dark:border-gray-700">
+      <form [formGroup]="requisitionForm" (ngSubmit)="onSubmit(false)" class="p-4 sm:p-6">
+        @if (errorMessage) {
+          <div class="mb-4 flex items-center p-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+            <svg class="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+            </svg>
+            <div>{{ errorMessage }}</div>
+          </div>
+        }
+
+        <div class="space-y-6">
+          <!-- Title -->
+          <div>
+            <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+            <input
+              type="text"
+              id="title"
+              formControlName="title"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            />
+            @if (requisitionForm.get('title')?.invalid && requisitionForm.get('title')?.touched) {
+              <p class="mt-1 text-sm text-red-600 dark:text-red-400">Title is required</p>
+            }
+          </div>
+
+          <!-- Description -->
+          <div>
+            <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+            <textarea
+              id="description"
+              formControlName="description"
+              rows="4"
+              class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            ></textarea>
+            @if (requisitionForm.get('description')?.invalid && requisitionForm.get('description')?.touched) {
+              <p class="mt-1 text-sm text-red-600 dark:text-red-400">Description is required</p>
+            }
+          </div>
+
+          <!-- Category -->
+          <div>
+            <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
+            <select
+              id="category"
+              formControlName="category"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            >
+              <option value="">Select a category</option>
+              @for (category of categories; track category) {
+                <option [value]="category">{{ category }}</option>
+              }
+            </select>
+            @if (requisitionForm.get('category')?.invalid && requisitionForm.get('category')?.touched) {
+              <p class="mt-1 text-sm text-red-600 dark:text-red-400">Category is required</p>
+            }
+          </div>
+
+          <!-- Priority -->
+          <div>
+            <label for="priority" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Priority</label>
+            <select
+              id="priority"
+              formControlName="priority"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            >
+              @for (priority of priorities; track priority) {
+                <option [value]="priority">{{ priority }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Assigned Approvers -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Assigned Approvers</label>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Select one or more users to approve this requisition</p>
+            <div class="border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 p-4 max-h-60 overflow-y-auto">
+              @if (activeUsers.length === 0) {
+                <p class="text-sm text-gray-500 dark:text-gray-400">No active users available</p>
+              } @else {
+                <div class="space-y-2">
+                  @for (user of activeUsers; track user.id) {
+                    <label class="flex items-center">
+                      <input
+                        type="checkbox"
+                        [checked]="isApproverSelected(user.id)"
+                        (change)="toggleApprover(user.id)"
+                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                      />
+                      <span class="ml-2 text-sm text-gray-900 dark:text-white">{{ user.name }} ({{ user.email }})</span>
+                    </label>
+                  }
+                </div>
+              }
+            </div>
+            @if (requisitionForm.get('assignedApprovers')?.invalid && requisitionForm.get('assignedApprovers')?.touched) {
+              <p class="mt-1 text-sm text-red-600 dark:text-red-400">At least one approver is required when submitting</p>
+            }
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="mt-6 flex flex-col sm:flex-row justify-end gap-3">
+          <button
+            type="button"
+            (click)="cancel()"
+            class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 transition-all duration-200"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            (click)="onSubmit(true)"
+            [disabled]="isLoading"
+            class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          >
+            Save as Draft
+          </button>
+          <button
+            type="submit"
+            [disabled]="requisitionForm.invalid || isLoading"
+            class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          >
+            @if (isLoading) {
+              <span>Submitting...</span>
+            } @else {
+              <span>{{ isEditMode ? 'Update' : 'Submit for Approval' }}</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>
+
