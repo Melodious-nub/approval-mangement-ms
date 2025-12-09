@@ -39,11 +39,19 @@ export class UserService {
     return of(null).pipe(
       delay(400), // Simulate API delay
       map(() => {
+        // Check if email already exists
+        if (this.users.some(u => u.email === user.email)) {
+          throw new Error('Email already exists');
+        }
+
         const newUser: User = {
           ...user,
-          id: `user_${Date.now()}` // Generate ID
+          id: `user_${Date.now()}`, // Generate ID
+          password: user.password // Store password (in real app, this would be hashed)
         };
         this.users.push(newUser);
+        // Also update auth service dummy users
+        this.authService.updateDummyUsers(this.users);
         return { ...newUser };
       })
     );
@@ -58,7 +66,24 @@ export class UserService {
         if (index === -1) {
           throw new Error('User not found');
         }
-        this.users[index] = { ...this.users[index], ...updates };
+        
+        // Check email uniqueness if email is being updated
+        if (updates.email && this.users.some((u, i) => i !== index && u.email === updates.email)) {
+          throw new Error('Email already exists');
+        }
+
+        // Only update password if provided
+        const userUpdates = { ...updates };
+        if (!userUpdates.password) {
+          delete userUpdates.password;
+        } else {
+          // In real app, password would be hashed
+          userUpdates.password = userUpdates.password;
+        }
+
+        this.users[index] = { ...this.users[index], ...userUpdates };
+        // Also update auth service dummy users
+        this.authService.updateDummyUsers(this.users);
         return { ...this.users[index] };
       })
     );

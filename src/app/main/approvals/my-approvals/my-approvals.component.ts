@@ -9,13 +9,12 @@ import { AuthService } from '../../../core/services/auth.service';
 import { Requisition, RequisitionStatus } from '../../../core/models/requisition.model';
 import { User } from '../../../core/models/user.model';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
-import { PriorityBadgeComponent } from '../../../shared/components/priority-badge/priority-badge.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-my-approvals',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, StatusBadgeComponent, PriorityBadgeComponent, LoadingSpinnerComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, StatusBadgeComponent, LoadingSpinnerComponent],
   templateUrl: './my-approvals.component.html',
   styleUrl: './my-approvals.component.scss'
 })

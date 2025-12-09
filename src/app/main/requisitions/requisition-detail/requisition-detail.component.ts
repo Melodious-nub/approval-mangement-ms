@@ -5,28 +5,31 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { RequisitionService } from '../../../core/services/requisition.service';
 import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { AlertService } from '../../../core/services/alert.service';
 import { Requisition } from '../../../core/models/requisition.model';
 import { User } from '../../../core/models/user.model';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
-import { PriorityBadgeComponent } from '../../../shared/components/priority-badge/priority-badge.component';
+import { ApproverTimelineComponent } from '../../../shared/components/approver-timeline/approver-timeline.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-requisition-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, StatusBadgeComponent, PriorityBadgeComponent, LoadingSpinnerComponent],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, ApproverTimelineComponent, LoadingSpinnerComponent],
   templateUrl: './requisition-detail.component.html',
   styleUrl: './requisition-detail.component.scss'
 })
 export class RequisitionDetailComponent implements OnInit {
   requisition: Requisition | null = null;
   creator: User | null = null;
-  approvers: User[] = [];
+  accountsPerson: User | null = null;
   currentUserId: string | null = null;
   isLoading: boolean = true;
   isSubmitting: boolean = false;
   errorMessage: string = '';
   successMessage: string = '';
+  remarks: string = '';
+  approverNames: { [id: string]: string } = {};
 
   approvalForm: FormGroup;
   canApprove: boolean = false;
@@ -37,6 +40,7 @@ export class RequisitionDetailComponent implements OnInit {
     private requisitionService: RequisitionService,
     private userService: UserService,
     private authService: AuthService,
+    private alertService: AlertService,
     private fb: FormBuilder
   ) {
     this.approvalForm = this.fb.group({
@@ -83,13 +87,20 @@ export class RequisitionDetailComponent implements OnInit {
       this.creator = user;
     });
 
-    // Load approvers
-    const approverPromises = requisition.assignedApprovers.map(id =>
-      this.userService.getUserById(id).toPromise()
-    );
+    // Load accounts person if exists
+    if (requisition.accountsPersonId) {
+      this.userService.getUserById(requisition.accountsPersonId).subscribe(user => {
+        this.accountsPerson = user;
+      });
+    }
 
-    Promise.all(approverPromises).then(users => {
-      this.approvers = users.filter(u => u !== null) as User[];
+    // Load approver names for remarks display
+    requisition.approvalHistory.forEach(action => {
+      this.userService.getUserById(action.approverId).subscribe(user => {
+        if (user) {
+          this.approverNames[action.approverId] = user.name;
+        }
+      });
     });
   }
 
@@ -113,29 +124,45 @@ export class RequisitionDetailComponent implements OnInit {
     this.canApprove = isAssigned && isPending && !hasAlreadyActed;
   }
 
+  formatFileSize(bytes: number): string {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
+    return (bytes / 1048576).toFixed(2) + ' MB';
+  }
+
   approve(): void {
     if (this.approvalForm.invalid || !this.requisition || !this.currentUserId) {
       return;
     }
 
-    this.isSubmitting = true;
-    this.errorMessage = '';
-    this.successMessage = '';
+    this.alertService.confirm(
+      'Approve Requisition',
+      'Are you sure you want to approve this requisition?',
+      'Approve',
+      'Cancel'
+    ).then((result) => {
+      if (result.isConfirmed) {
+        this.isSubmitting = true;
+        this.errorMessage = '';
+        this.successMessage = '';
 
-    const comment = this.approvalForm.get('comment')?.value;
+        const comment = this.approvalForm.get('comment')?.value;
 
-    this.requisitionService.approveRequisition(this.requisition.id, this.currentUserId, comment).subscribe({
-      next: (requisition) => {
-        this.requisition = requisition;
-        this.approvalForm.reset();
-        this.checkCanApprove();
-        this.successMessage = 'Requisition approved successfully';
-        this.isSubmitting = false;
-      },
-      error: (error) => {
-        console.error('Error approving requisition:', error);
-        this.errorMessage = error.message || 'Failed to approve requisition';
-        this.isSubmitting = false;
+        this.requisitionService.approveRequisition(this.requisition!.id, this.currentUserId!, comment).subscribe({
+          next: (requisition) => {
+            this.requisition = requisition;
+            this.approvalForm.reset();
+            this.checkCanApprove();
+            this.alertService.success('Success', 'Requisition approved successfully');
+            this.isSubmitting = false;
+          },
+          error: (error) => {
+            console.error('Error approving requisition:', error);
+            this.errorMessage = error.message || 'Failed to approve requisition';
+            this.alertService.error('Error', this.errorMessage);
+            this.isSubmitting = false;
+          }
+        });
       }
     });
   }
@@ -145,42 +172,49 @@ export class RequisitionDetailComponent implements OnInit {
       return;
     }
 
-    this.isSubmitting = true;
-    this.errorMessage = '';
-    this.successMessage = '';
+    this.alertService.confirm(
+      'Reject Requisition',
+      'Are you sure you want to reject this requisition?',
+      'Reject',
+      'Cancel'
+    ).then((result) => {
+      if (result.isConfirmed) {
+        this.isSubmitting = true;
+        this.errorMessage = '';
+        this.successMessage = '';
 
-    const comment = this.approvalForm.get('comment')?.value;
+        const comment = this.approvalForm.get('comment')?.value;
 
-    this.requisitionService.rejectRequisition(this.requisition.id, this.currentUserId, comment).subscribe({
-      next: (requisition) => {
-        this.requisition = requisition;
-        this.approvalForm.reset();
-        this.checkCanApprove();
-        this.successMessage = 'Requisition rejected';
-        this.isSubmitting = false;
-      },
-      error: (error) => {
-        console.error('Error rejecting requisition:', error);
-        this.errorMessage = error.message || 'Failed to reject requisition';
-        this.isSubmitting = false;
+        this.requisitionService.rejectRequisition(this.requisition!.id, this.currentUserId!, comment).subscribe({
+          next: (requisition) => {
+            this.requisition = requisition;
+            this.approvalForm.reset();
+            this.checkCanApprove();
+            this.alertService.success('Success', 'Requisition rejected');
+            this.isSubmitting = false;
+          },
+          error: (error) => {
+            console.error('Error rejecting requisition:', error);
+            this.errorMessage = error.message || 'Failed to reject requisition';
+            this.alertService.error('Error', this.errorMessage);
+            this.isSubmitting = false;
+          }
+        });
       }
     });
   }
 
+  requestForChange(): void {
+    // TODO: Implement request for change functionality
+    this.alertService.info('Coming Soon', 'Request for Change feature will be available soon.');
+  }
+
+  print(): void {
+    window.print();
+  }
+
   getApproverName(approverId: string): string {
-    const approver = this.approvers.find(a => a.id === approverId);
-    return approver ? approver.name : 'Unknown';
-  }
-
-  hasApproverActed(approverId: string): boolean {
-    if (!this.requisition) return false;
-    return this.requisition.approvalHistory.some(a => a.approverId === approverId);
-  }
-
-  getApproverAction(approverId: string): string {
-    if (!this.requisition) return '';
-    const action = this.requisition.approvalHistory.find(a => a.approverId === approverId);
-    return action ? action.action : '';
+    return this.approverNames[approverId] || 'Loading...';
   }
 }
 

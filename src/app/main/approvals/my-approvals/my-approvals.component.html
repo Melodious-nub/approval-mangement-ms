@@ -46,15 +46,14 @@
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
               <div class="flex-1 min-w-0">
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-                  <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white break-words">{{ req.title }}</h3>
+                  <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white break-words">{{ req.subject }}</h3>
                   <app-status-badge [status]="req.status"></app-status-badge>
-                  <app-priority-badge [priority]="req.priority"></app-priority-badge>
                 </div>
-                <p class="text-sm text-gray-600 dark:text-gray-300 mb-2 break-words">{{ req.description }}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-2 break-words">{{ req.summary }}</p>
                 <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs text-gray-500 dark:text-gray-400">
-                  <span>Category: {{ req.category }}</span>
+                  <span>Reference: {{ req.referenceNumber }}</span>
                   <span>Created by: {{ getCreatorName(req.createdBy) }}</span>
-                  <span>Created: {{ req.createdAt | date:'short' }}</span>
+                  <span>Date: {{ req.date | date:'short' }}</span>
                 </div>
               </div>
               <div class="flex-shrink-0">

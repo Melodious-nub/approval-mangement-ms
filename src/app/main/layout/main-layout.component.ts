@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { AlertService } from '../../core/services/alert.service';
 import { User } from '../../core/models/user.model';
 
 @Component({
@@ -17,6 +18,7 @@ export class MainLayoutComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
+    private alertService: AlertService,
     private router: Router
   ) {}
 
@@ -27,8 +29,18 @@ export class MainLayoutComponent implements OnInit {
   }
 
   logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+    this.alertService.confirm(
+      'Confirm Logout',
+      'Are you sure you want to logout?',
+      'Logout',
+      'Cancel'
+    ).then((result) => {
+      if (result.isConfirmed) {
+        this.authService.logout();
+        this.router.navigate(['/login']);
+        this.alertService.success('Logged Out', 'You have been successfully logged out.');
+      }
+    });
   }
 
   toggleSidebar(): void {

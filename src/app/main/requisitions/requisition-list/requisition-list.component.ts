@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { RequisitionService } from '../../../core/services/requisition.service';
-import { Requisition, RequisitionStatus, RequisitionPriority } from '../../../core/models/requisition.model';
+import { AuthService } from '../../../core/services/auth.service';
+import { Requisition, RequisitionStatus } from '../../../core/models/requisition.model';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
-import { PriorityBadgeComponent } from '../../../shared/components/priority-badge/priority-badge.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-requisition-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, StatusBadgeComponent, PriorityBadgeComponent, LoadingSpinnerComponent],
+  imports: [CommonModule, RouterModule, FormsModule, StatusBadgeComponent, LoadingSpinnerComponent],
   templateUrl: './requisition-list.component.html',
   styleUrl: './requisition-list.component.scss'
 })
@@ -21,14 +21,22 @@ export class RequisitionListComponent implements OnInit {
   isLoading: boolean = true;
   searchTerm: string = '';
   statusFilter: RequisitionStatus | 'all' = 'all';
-  priorityFilter: RequisitionPriority | 'all' = 'all';
+  currentUserId: string | null = null;
+  openActionMenuId: string | null = null;
 
   statuses: (RequisitionStatus | 'all')[] = ['all', 'Draft', 'Pending', 'Approved', 'Rejected'];
-  priorities: (RequisitionPriority | 'all')[] = ['all', 'Low', 'Medium', 'High'];
 
-  constructor(private requisitionService: RequisitionService) {}
+  constructor(
+    private requisitionService: RequisitionService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
+    this.authService.getCurrentUser().subscribe(user => {
+      if (user) {
+        this.currentUserId = user.id;
+      }
+    });
     this.loadRequisitions();
   }
 
@@ -53,17 +61,15 @@ export class RequisitionListComponent implements OnInit {
     // Apply search filter
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(req => req.title.toLowerCase().includes(term));
+      filtered = filtered.filter(req => 
+        req.subject.toLowerCase().includes(term) ||
+        req.referenceNumber.toLowerCase().includes(term)
+      );
     }
 
     // Apply status filter
     if (this.statusFilter !== 'all') {
       filtered = filtered.filter(req => req.status === this.statusFilter);
-    }
-
-    // Apply priority filter
-    if (this.priorityFilter !== 'all') {
-      filtered = filtered.filter(req => req.priority === this.priorityFilter);
     }
 
     this.filteredRequisitions = filtered;
@@ -75,6 +81,43 @@ export class RequisitionListComponent implements OnInit {
 
   onFilterChange(): void {
     this.applyFilters();
+  }
+
+  toggleActionMenu(requisitionId: string): void {
+    this.openActionMenuId = this.openActionMenuId === requisitionId ? null : requisitionId;
+  }
+
+  closeActionMenu(): void {
+    this.openActionMenuId = null;
+  }
+
+  canApprove(requisition: Requisition): boolean {
+    if (!this.currentUserId || requisition.status !== 'Pending') {
+      return false;
+    }
+    const isAssigned = requisition.assignedApprovers.includes(this.currentUserId);
+    const hasActed = requisition.approvalHistory.some(a => a.approverId === this.currentUserId);
+    return isAssigned && !hasActed;
+  }
+
+  isLastRow(requisitionId: string): boolean {
+    if (this.filteredRequisitions.length === 0) {
+      return false;
+    }
+    const lastIndex = this.filteredRequisitions.length - 1;
+    const currentIndex = this.filteredRequisitions.findIndex(r => r.id === requisitionId);
+    // Show dropdown above if it's in the last 2 rows
+    return currentIndex >= lastIndex - 1 && currentIndex >= 0;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    // Check if click is outside any action menu button or dropdown
+    const isClickInsideActionMenu = target.closest('.action-menu-container') !== null;
+    if (!isClickInsideActionMenu && this.openActionMenuId !== null) {
+      this.closeActionMenu();
+    }
   }
 }
 

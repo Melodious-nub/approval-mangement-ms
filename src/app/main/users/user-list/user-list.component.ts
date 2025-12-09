@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../../core/services/user.service';
+import { AlertService } from '../../../core/services/alert.service';
 import { User } from '../../../core/models/user.model';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
@@ -20,7 +21,10 @@ export class UserListComponent implements OnInit {
   searchTerm: string = '';
   activeFilter: 'all' | 'active' | 'inactive' = 'all';
 
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private alertService: AlertService
+  ) {}
 
   ngOnInit(): void {
     this.loadUsers();
@@ -72,17 +76,25 @@ export class UserListComponent implements OnInit {
   }
 
   deactivateUser(userId: string): void {
-    if (confirm('Are you sure you want to deactivate this user?')) {
-      this.userService.deactivateUser(userId).subscribe({
-        next: () => {
-          this.loadUsers();
-        },
-        error: (error) => {
-          console.error('Error deactivating user:', error);
-          alert('Failed to deactivate user');
-        }
-      });
-    }
+    this.alertService.confirm(
+      'Deactivate User',
+      'Are you sure you want to deactivate this user?',
+      'Deactivate',
+      'Cancel'
+    ).then((result) => {
+      if (result.isConfirmed) {
+        this.userService.deactivateUser(userId).subscribe({
+          next: () => {
+            this.loadUsers();
+            this.alertService.success('Success', 'User deactivated successfully');
+          },
+          error: (error) => {
+            console.error('Error deactivating user:', error);
+            this.alertService.error('Error', 'Failed to deactivate user');
+          }
+        });
+      }
+    });
   }
 }
 

@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RequisitionPriority } from '../../../core/models/requisition.model';
+
+export type Priority = 'Low' | 'Medium' | 'High';
 
 @Component({
   selector: 'app-priority-badge',
@@ -10,10 +11,10 @@ import { RequisitionPriority } from '../../../core/models/requisition.model';
   styleUrl: './priority-badge.component.scss'
 })
 export class PriorityBadgeComponent {
-  @Input() priority!: RequisitionPriority;
+  @Input() priority!: Priority;
 
   getPriorityClass(): string {
-    const classes: { [key in RequisitionPriority]: string } = {
+    const classes: { [key in Priority]: string } = {
       'Low': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
       'Medium': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
       'High': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'

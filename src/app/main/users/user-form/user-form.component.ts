@@ -29,6 +29,7 @@ export class UserFormComponent implements OnInit {
     this.userForm = this.fb.group({
       name: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.minLength(6)]], // Optional, but if provided must be at least 6 characters
       active: [true]
     });
   }
@@ -49,7 +50,13 @@ export class UserFormComponent implements OnInit {
     this.userService.getUserById(id).subscribe({
       next: (user) => {
         if (user) {
-          this.userForm.patchValue(user);
+          // Don't load password for edit mode (for security)
+          const { password, ...userWithoutPassword } = user;
+          this.userForm.patchValue(userWithoutPassword);
+          // Clear password field in edit mode
+          this.userForm.get('password')?.setValue('');
+          this.userForm.get('password')?.clearValidators();
+          this.userForm.get('password')?.updateValueAndValidity();
         }
         this.isLoading = false;
       },
@@ -66,10 +73,21 @@ export class UserFormComponent implements OnInit {
       return;
     }
 
+    // For new users, password is required
+    if (!this.isEditMode && !this.userForm.value.password) {
+      this.userForm.get('password')?.setErrors({ required: true });
+      return;
+    }
+
     this.isLoading = true;
     this.errorMessage = '';
 
-    const formValue = this.userForm.value;
+    const formValue = { ...this.userForm.value };
+    
+    // Remove password from update if not provided (edit mode)
+    if (this.isEditMode && !formValue.password) {
+      delete formValue.password;
+    }
 
     if (this.isEditMode && this.userId) {
       this.userService.updateUser(this.userId, formValue).subscribe({

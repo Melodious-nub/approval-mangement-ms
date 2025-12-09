@@ -3,28 +3,41 @@ import { Observable, of, throwError } from 'rxjs';
 import { delay, map } from 'rxjs/operators';
 import { Requisition, RequisitionStatus } from '../models/requisition.model';
 import { ApprovalAction, ApprovalActionType } from '../models/approval-action.model';
+import { FileAttachment } from '../models/file-attachment.model';
 
 // TODO: Replace with real API calls
-// Dummy requisitions data
+// Dummy requisitions data - Updated to new memo-style structure
 let DUMMY_REQUISITIONS: Requisition[] = [
   {
     id: 'req_1',
-    title: 'Office Chairs',
-    description: 'Need 10 ergonomic office chairs for the new office space',
-    category: 'Furniture',
-    priority: 'High',
+    referenceNumber: 'MEMO-2024-001',
+    date: new Date('2024-01-15'),
+    subject: 'Office Equipment Purchase',
+    tinNumber: '123456789',
+    binNid: '987654321',
+    summary: 'Request for purchasing new office equipment including chairs, desks, and computers to improve productivity and efficiency in the workplace.',
+    budget: 500000,
+    accountsPersonId: '2',
     createdBy: '1',
     assignedApprovers: ['2', '3'],
     status: 'Pending',
     createdAt: new Date('2024-01-15'),
-    approvalHistory: []
+    approvalHistory: [],
+    attachedFiles: [
+      { id: 'file_1', fileName: 'quotation.pdf', fileSize: 245000, uploadDate: new Date('2024-01-15'), fileType: 'pdf' },
+      { id: 'file_2', fileName: 'specification.docx', fileSize: 156000, uploadDate: new Date('2024-01-15'), fileType: 'docx' }
+    ]
   },
   {
     id: 'req_2',
-    title: 'Laptop Computers',
-    description: 'Request for 5 new laptops for the development team',
-    category: 'IT Equipment',
-    priority: 'High',
+    referenceNumber: 'MEMO-2024-002',
+    date: new Date('2024-01-10'),
+    subject: 'Laptop Computers for Development Team',
+    tinNumber: '111222333',
+    binNid: '444555666',
+    summary: 'Request for 5 new laptops for the development team to support ongoing projects and improve development efficiency.',
+    budget: 750000,
+    accountsPersonId: null,
     createdBy: '2',
     assignedApprovers: ['1'],
     status: 'Approved',
@@ -36,14 +49,19 @@ let DUMMY_REQUISITIONS: Requisition[] = [
         comment: 'Approved for budget allocation',
         actionDate: new Date('2024-01-11')
       }
-    ]
+    ],
+    attachedFiles: []
   },
   {
     id: 'req_3',
-    title: 'Stationery Supplies',
-    description: 'Monthly stationery order - pens, papers, folders',
-    category: 'Office Supplies',
-    priority: 'Low',
+    referenceNumber: 'MEMO-2024-003',
+    date: new Date('2024-01-08'),
+    subject: 'Monthly Stationery Order',
+    tinNumber: '555666777',
+    binNid: '888999000',
+    summary: 'Monthly stationery order including pens, papers, folders, and other office supplies for regular operations.',
+    budget: 25000,
+    accountsPersonId: '2',
     createdBy: '3',
     assignedApprovers: ['4'],
     status: 'Rejected',
@@ -55,31 +73,41 @@ let DUMMY_REQUISITIONS: Requisition[] = [
         comment: 'Budget constraints, please reduce quantity',
         actionDate: new Date('2024-01-09')
       }
-    ]
+    ],
+    attachedFiles: []
   },
   {
     id: 'req_4',
-    title: 'Standing Desks',
-    description: 'Request for 3 adjustable standing desks',
-    category: 'Furniture',
-    priority: 'Medium',
+    referenceNumber: 'MEMO-2024-004',
+    date: new Date('2024-01-20'),
+    subject: 'Standing Desks for Office',
+    tinNumber: '123456789',
+    binNid: '987654321',
+    summary: 'Request for 3 adjustable standing desks to promote better health and productivity among employees.',
+    budget: 150000,
+    accountsPersonId: '2',
     createdBy: '1',
     assignedApprovers: ['2', '3', '4'],
     status: 'Pending',
     createdAt: new Date('2024-01-20'),
-    approvalHistory: []
+    approvalHistory: [],
+    attachedFiles: []
   },
   {
     id: 'req_5',
-    title: 'Draft Requisition',
-    description: 'This is a draft requisition',
-    category: 'Office Supplies',
-    priority: 'Low',
+    referenceNumber: 'MEMO-2024-005',
+    date: new Date('2024-01-22'),
+    subject: 'Draft Requisition for Review',
+    tinNumber: '111222333',
+    binNid: '444555666',
+    summary: 'This is a draft requisition that needs to be completed before submission.',
+    accountsPersonId: null,
     createdBy: '2',
     assignedApprovers: [],
     status: 'Draft',
     createdAt: new Date('2024-01-22'),
-    approvalHistory: []
+    approvalHistory: [],
+    attachedFiles: []
   }
 ];
 
@@ -135,11 +163,25 @@ export class RequisitionService {
     return of(null).pipe(
       delay(400), // Simulate API delay
       map(() => {
+        // Generate reference number if not provided
+        let referenceNumber = requisition.referenceNumber;
+        if (!referenceNumber) {
+          const currentYear = new Date().getFullYear();
+          const yearRequisitions = DUMMY_REQUISITIONS.filter(r => {
+            const reqYear = new Date(r.createdAt).getFullYear();
+            return reqYear === currentYear;
+          });
+          const nextNumber = (yearRequisitions.length + 1).toString().padStart(3, '0');
+          referenceNumber = `MEMO-${currentYear}-${nextNumber}`;
+        }
+
         const newRequisition: Requisition = {
           ...requisition,
           id: `req_${Date.now()}`,
+          referenceNumber,
           createdAt: new Date(),
-          approvalHistory: []
+          approvalHistory: [],
+          attachedFiles: requisition.attachedFiles || []
         };
         DUMMY_REQUISITIONS.push(newRequisition);
         return { ...newRequisition };

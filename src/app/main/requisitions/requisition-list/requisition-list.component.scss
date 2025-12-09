@@ -1,2 +1,19 @@
-// Component-specific styles if needed
+// Ensure dropdown menus appear above table
+:host {
+  .overflow-visible {
+    overflow: visible !important;
+  }
+}
 
+// Increase z-index for dropdown when open
+tbody tr td {
+  position: relative;
+  
+  .relative {
+    position: relative;
+    
+    &:has(button:focus) {
+      z-index: 50;
+    }
+  }
+}

@@ -7,12 +7,10 @@ import { UserService } from '../../core/services/user.service';
 import { Requisition } from '../../core/models/requisition.model';
 import { User } from '../../core/models/user.model';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
-import { PriorityBadgeComponent } from '../../shared/components/priority-badge/priority-badge.component';
-
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, LoadingSpinnerComponent, PriorityBadgeComponent],
+  imports: [CommonModule, RouterModule, LoadingSpinnerComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })

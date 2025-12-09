@@ -47,9 +47,38 @@
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             />
             @if (userForm.get('email')?.invalid && userForm.get('email')?.touched) {
-              <p class="mt-1 text-sm text-red-600">
+              <p class="mt-1 text-sm text-red-600 dark:text-red-400">
                 {{ userForm.get('email')?.errors?.['required'] ? 'Email is required' : 'Valid email is required' }}
               </p>
+            }
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Password
+              @if (!isEditMode) {
+                <span class="text-red-500">*</span>
+              }
+            </label>
+            <input
+              type="password"
+              id="password"
+              formControlName="password"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              [placeholder]="isEditMode ? 'Leave blank to keep current password' : 'Enter password (min 6 characters)'"
+            />
+            @if (userForm.get('password')?.invalid && userForm.get('password')?.touched) {
+              <p class="mt-1 text-sm text-red-600 dark:text-red-400">
+                @if (userForm.get('password')?.errors?.['required']) {
+                  Password is required
+                } @else if (userForm.get('password')?.errors?.['minlength']) {
+                  Password must be at least 6 characters
+                }
+              </p>
+            }
+            @if (isEditMode) {
+              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Leave blank to keep current password</p>
             }
           </div>
 

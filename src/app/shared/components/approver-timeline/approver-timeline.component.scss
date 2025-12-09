@@ -1,0 +1,9 @@
+:host {
+  display: block;
+}
+
+// Dashed line for waiting status
+.dashed-line {
+  border-left: 2px dashed;
+  background: transparent !important;
+}

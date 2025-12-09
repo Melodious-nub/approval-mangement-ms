@@ -85,5 +85,19 @@ export class AuthService {
   getDummyUsers(): User[] {
     return DUMMY_USERS;
   }
+
+  // Update dummy users (called from user service)
+  updateDummyUsers(users: User[]): void {
+    // Update the shared array reference
+    DUMMY_USERS.length = 0;
+    DUMMY_USERS.push(...users);
+    
+    // Update password mapping for new users
+    users.forEach(user => {
+      if (user.password && !USER_PASSWORDS[user.email]) {
+        USER_PASSWORDS[user.email] = user.password;
+      }
+    });
+  }
 }
 

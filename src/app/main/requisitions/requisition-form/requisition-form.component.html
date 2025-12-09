@@ -1,10 +1,10 @@
-<div>
-  <div class="mb-6">
+<div class="w-full max-w-full">
+  <div class="mb-4 md:mb-6">
     <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
       {{ isEditMode ? 'Edit Requisition' : 'Create Requisition' }}
     </h1>
     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-      {{ isEditMode ? 'Update requisition information' : 'Create a new item requisition' }}
+      {{ isEditMode ? 'Update requisition information' : 'Create a new memo requisition' }}
     </p>
   </div>
 
@@ -23,91 +23,285 @@
         }
 
         <div class="space-y-6">
-          <!-- Title -->
+          <!-- Memo Details Section -->
           <div>
-            <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
-            <input
-              type="text"
-              id="title"
-              formControlName="title"
-              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            />
-            @if (requisitionForm.get('title')?.invalid && requisitionForm.get('title')?.touched) {
-              <p class="mt-1 text-sm text-red-600 dark:text-red-400">Title is required</p>
-            }
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Memo Details</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Reference Number -->
+              <div>
+                <label for="referenceNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Reference Number
+                </label>
+                <input
+                  type="text"
+                  id="referenceNumber"
+                  formControlName="referenceNumber"
+                  readonly
+                  class="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 cursor-not-allowed"
+                />
+              </div>
+
+              <!-- Date -->
+              <div>
+                <label for="date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Date <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  id="date"
+                  formControlName="date"
+                  [max]="maxDate"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  required
+                />
+                @if (requisitionForm.get('date')?.invalid && requisitionForm.get('date')?.touched) {
+                  <p class="mt-1 text-sm text-red-600 dark:text-red-400">Date is required</p>
+                }
+              </div>
+
+              <!-- Subject -->
+              <div class="md:col-span-2">
+                <label for="subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Subject <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="subject"
+                  formControlName="subject"
+                  placeholder="Enter memo subject"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  required
+                />
+                @if (requisitionForm.get('subject')?.invalid && requisitionForm.get('subject')?.touched) {
+                  <p class="mt-1 text-sm text-red-600 dark:text-red-400">Subject is required</p>
+                }
+              </div>
+
+              <!-- TIN Certificate Number -->
+              <div>
+                <label for="tinNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  TIN Certificate Number <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="tinNumber"
+                  formControlName="tinNumber"
+                  placeholder="Enter TIN number"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  required
+                />
+                @if (requisitionForm.get('tinNumber')?.invalid && requisitionForm.get('tinNumber')?.touched) {
+                  <p class="mt-1 text-sm text-red-600 dark:text-red-400">TIN Certificate Number is required</p>
+                }
+              </div>
+
+              <!-- BIN/NID -->
+              <div>
+                <label for="binNid" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  BIN/NID <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="binNid"
+                  formControlName="binNid"
+                  placeholder="Enter BIN/NID"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  required
+                />
+                @if (requisitionForm.get('binNid')?.invalid && requisitionForm.get('binNid')?.touched) {
+                  <p class="mt-1 text-sm text-red-600 dark:text-red-400">BIN/NID is required</p>
+                }
+              </div>
+
+              <!-- Budget -->
+              <div>
+                <label for="budget" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Budget (Optional)
+                </label>
+                <input
+                  type="number"
+                  id="budget"
+                  formControlName="budget"
+                  placeholder="Enter budget amount"
+                  min="0"
+                  step="0.01"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                />
+              </div>
+            </div>
           </div>
 
-          <!-- Description -->
+          <!-- Summary Section -->
           <div>
-            <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-            <textarea
-              id="description"
-              formControlName="description"
-              rows="4"
-              class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            ></textarea>
-            @if (requisitionForm.get('description')?.invalid && requisitionForm.get('description')?.touched) {
-              <p class="mt-1 text-sm text-red-600 dark:text-red-400">Description is required</p>
-            }
-          </div>
-
-          <!-- Category -->
-          <div>
-            <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
-            <select
-              id="category"
-              formControlName="category"
-              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            >
-              <option value="">Select a category</option>
-              @for (category of categories; track category) {
-                <option [value]="category">{{ category }}</option>
-              }
-            </select>
-            @if (requisitionForm.get('category')?.invalid && requisitionForm.get('category')?.touched) {
-              <p class="mt-1 text-sm text-red-600 dark:text-red-400">Category is required</p>
-            }
-          </div>
-
-          <!-- Priority -->
-          <div>
-            <label for="priority" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Priority</label>
-            <select
-              id="priority"
-              formControlName="priority"
-              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            >
-              @for (priority of priorities; track priority) {
-                <option [value]="priority">{{ priority }}</option>
-              }
-            </select>
-          </div>
-
-          <!-- Assigned Approvers -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Assigned Approvers</label>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Select one or more users to approve this requisition</p>
-            <div class="border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 p-4 max-h-60 overflow-y-auto">
-              @if (activeUsers.length === 0) {
-                <p class="text-sm text-gray-500 dark:text-gray-400">No active users available</p>
-              } @else {
-                <div class="space-y-2">
-                  @for (user of activeUsers; track user.id) {
-                    <label class="flex items-center">
-                      <input
-                        type="checkbox"
-                        [checked]="isApproverSelected(user.id)"
-                        (change)="toggleApprover(user.id)"
-                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                      />
-                      <span class="ml-2 text-sm text-gray-900 dark:text-white">{{ user.name }} ({{ user.email }})</span>
-                    </label>
-                  }
-                </div>
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Summary</h2>
+            <div>
+              <label for="summary" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Summary <span class="text-red-500">*</span>
+              </label>
+              <textarea
+                id="summary"
+                formControlName="summary"
+                rows="6"
+                placeholder="Enter summary"
+                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                required
+              ></textarea>
+              @if (requisitionForm.get('summary')?.invalid && requisitionForm.get('summary')?.touched) {
+                <p class="mt-1 text-sm text-red-600 dark:text-red-400">Summary is required</p>
               }
             </div>
+          </div>
+
+          <!-- Accounts Person for Budget -->
+          <div>
+            <div class="flex items-center mb-4">
+              <input
+                type="checkbox"
+                id="includeAccountsPerson"
+                formControlName="includeAccountsPerson"
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <label for="includeAccountsPerson" class="ml-2 block text-sm font-medium text-gray-900 dark:text-white">
+                Include an accounts person for budget
+              </label>
+            </div>
+            @if (includeAccountsPerson) {
+              <div>
+                <label for="accountsPerson" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Accounts Person <span class="text-red-500">*</span>
+                </label>
+                <select
+                  id="accountsPerson"
+                  formControlName="accountsPersonId"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  required
+                >
+                  <option value="">Search and select accounts person</option>
+                  @for (user of activeUsers; track user.id) {
+                    <option [value]="user.id">{{ user.name }} ({{ user.email }})</option>
+                  }
+                </select>
+                @if (requisitionForm.get('accountsPersonId')?.invalid && requisitionForm.get('accountsPersonId')?.touched && includeAccountsPerson) {
+                  <p class="mt-1 text-sm text-red-600 dark:text-red-400">Accounts Person is required</p>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Approvers Section -->
+          <div>
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Approvers</h2>
+            
+            <!-- Add Approver -->
+            <div class="mb-4">
+              <label for="approverSelect" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Add Approver
+              </label>
+              <div class="flex gap-2">
+                <select
+                  id="approverSelect"
+                  class="flex-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  (change)="addApprover($any($event.target).value); $any($event.target).value = ''"
+                >
+                  <option value="">Search and select approver</option>
+                  @for (user of getAvailableApprovers(); track user.id) {
+                    <option [value]="user.id">{{ user.name }} ({{ user.email }})</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <!-- Selected Approvers List -->
+            @if (getSelectedApprovers().length > 0) {
+              <div class="space-y-2">
+                @for (approver of getSelectedApprovers(); track approver.id; let i = $index) {
+                  <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">
+                        {{ approver.name.charAt(0) }}
+                      </div>
+                      <div>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ approver.name }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ approver.email }}</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      (click)="removeApprover(i)"
+                      class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400"
+                    >
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                    </button>
+                  </div>
+                }
+              </div>
+            } @else {
+              <p class="text-sm text-gray-500 dark:text-gray-400">No approvers selected. Please add at least one approver.</p>
+            }
             @if (requisitionForm.get('assignedApprovers')?.invalid && requisitionForm.get('assignedApprovers')?.touched) {
-              <p class="mt-1 text-sm text-red-600 dark:text-red-400">At least one approver is required when submitting</p>
+              <p class="mt-2 text-sm text-red-600 dark:text-red-400">At least one approver is required when submitting</p>
+            }
+          </div>
+
+          <!-- File Attachments Section -->
+          <div>
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">File Attachments</h2>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Upload Files</label>
+              <div class="flex items-center justify-center w-full">
+                <label
+                  for="fileUpload"
+                  class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-800 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500"
+                >
+                  <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                    <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                    </svg>
+                    <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                      <span class="font-semibold text-blue-600 dark:text-blue-500">Click to upload</span> or drag and drop
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">PDF, DOC, DOCX, XLS, XLSX, CSV, Images (Max 350 KB per file)</p>
+                  </div>
+                  <input
+                    id="fileUpload"
+                    type="file"
+                    class="hidden"
+                    multiple
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,image/*"
+                    (change)="onFileSelected($event)"
+                  />
+                </label>
+              </div>
+            </div>
+
+            <!-- Uploaded Files List -->
+            @if (selectedFiles.length > 0) {
+              <div class="mt-4 space-y-2">
+                @for (file of selectedFiles; track file.id) {
+                  <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                    <div class="flex items-center gap-3">
+                      <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                      </svg>
+                      <div>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ file.fileName }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatFileSize(file.fileSize) }}</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      (click)="removeFile(file.id)"
+                      class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400"
+                    >
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                    </button>
+                  </div>
+                }
+              </div>
             }
           </div>
         </div>
@@ -137,7 +331,7 @@
             @if (isLoading) {
               <span>Submitting...</span>
             } @else {
-              <span>{{ isEditMode ? 'Update' : 'Submit for Approval' }}</span>
+              <span>{{ isEditMode ? 'Update' : 'Submit' }}</span>
             }
           </button>
         </div>
@@ -145,4 +339,3 @@
     </div>
   }
 </div>
-
