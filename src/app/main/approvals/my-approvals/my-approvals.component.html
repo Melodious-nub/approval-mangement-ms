@@ -95,16 +95,16 @@
 
                     <form [formGroup]="approvalForm" class="space-y-3">
                       <div>
-                        <label for="comment" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Comment</label>
+                        <label for="comment" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Review</label>
                         <textarea
                           id="comment"
                           formControlName="comment"
                           rows="2"
                           class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                          placeholder="Enter your comment..."
+                          placeholder="Write your review..."
                         ></textarea>
                         @if (approvalForm.get('comment')?.invalid && approvalForm.get('comment')?.touched) {
-                          <p class="mt-1 text-sm text-red-600 dark:text-red-400">Comment is required</p>
+                          <p class="mt-1 text-sm text-red-600 dark:text-red-400">Review is required</p>
                         }
                       </div>
 

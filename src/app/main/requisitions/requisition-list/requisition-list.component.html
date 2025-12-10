@@ -148,6 +148,16 @@
                       </td>
                     </tr>
                   }
+                  <!-- When there are only 1-2 rows, add two empty rows without hover effect
+                       so the dropdown opened below has enough space and doesn't cause scrolling -->
+                  @if (filteredRequisitions.length > 0 && filteredRequisitions.length <= 2) {
+                    <tr class="pointer-events-none">
+                      <td class="px-4 sm:px-6 py-4" colspan="5">&nbsp;</td>
+                    </tr>
+                    <tr class="pointer-events-none">
+                      <td class="px-4 sm:px-6 py-4" colspan="5">&nbsp;</td>
+                    </tr>
+                  }
                 </tbody>
               </table>
             </div>

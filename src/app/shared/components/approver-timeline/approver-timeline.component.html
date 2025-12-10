@@ -11,7 +11,7 @@
   } @else {
     <div class="relative pl-2">
       @for (approver of approvers; track approver.id; let isLast = $last; let index = $index) {
-        <div class="relative flex items-start">
+        <div class="relative flex items-start" [class.pb-6]="!isLast">
           <!-- Status Icon -->
           <div class="relative z-10 flex-shrink-0">
             @if (approver.status === 'Approved') {
@@ -43,15 +43,15 @@
 
           <!-- Timeline Line (between current and next) -->
           @if (!isLast) {
+            <!-- Waiting: dashed neutral line -->
             @if (approver.status === 'Waiting') {
               <div 
-                class="absolute left-4 top-10 w-0.5 h-full border-l-2 border-dashed border-gray-300 dark:border-gray-600"
-                style="background: transparent; height: 5rem;"
+                class="absolute left-5 top-10 bottom-0 w-px border-l-2 border-dashed border-gray-300 dark:border-gray-600 bg-transparent"
               ></div>
             } @else {
+              <!-- Active: solid colored line, full height to next approver -->
               <div 
-                class="absolute left-4 top-10 w-0.5"
-                style="height: 5rem;"
+                class="absolute left-5 top-10 bottom-0 w-px"
                 [ngClass]="{
                   'bg-green-500': approver.status === 'Approved',
                   'bg-orange-500': approver.status === 'In Progress',

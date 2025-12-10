@@ -101,12 +101,21 @@ export class RequisitionListComponent implements OnInit {
   }
 
   isLastRow(requisitionId: string): boolean {
-    if (this.filteredRequisitions.length === 0) {
+    const count = this.filteredRequisitions.length;
+    
+    if (count === 0) {
       return false;
     }
-    const lastIndex = this.filteredRequisitions.length - 1;
+    
+    // For 1-2 rows, always show dropdown below (return false)
+    // This way the dropdown opens downward, and we'll add empty rows for space
+    if (count <= 2) {
+      return false;
+    }
+    
+    const lastIndex = count - 1;
     const currentIndex = this.filteredRequisitions.findIndex(r => r.id === requisitionId);
-    // Show dropdown above if it's in the last 2 rows
+    // Show dropdown above if it's in the last 2 rows (for 3+ rows)
     return currentIndex >= lastIndex - 1 && currentIndex >= 0;
   }
 
